@@ -1,0 +1,41 @@
+{
+  "name": "LetMeCook - Your Ultimate Recipe Explorer",
+  "short_name": "LetMeCook",
+  "description": "Discover amazing recipes and become a cooking master. Let's cook fr fr no cap 🔥",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "./public/favicon-100x100.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./public/favicon-100x100.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#f97316",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "categories": ["food", "cooking", "recipes"],
+  "screenshots": [
+    {
+      "src": "./public/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ],
+  "share_target": {
+    "action": "/share-recipe",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

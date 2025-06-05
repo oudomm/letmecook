@@ -16,5 +16,9 @@
     "@tailwindcss/postcss": "^4.1.8",
     "parcel": "^2.15.2",
     "tailwindcss": "^4.1.8"
+  },
+  "devDependencies": {
+    "@parcel/packager-raw-url": "^2.15.2",
+    "@parcel/transformer-webmanifest": "^2.15.2"
   }
 }
