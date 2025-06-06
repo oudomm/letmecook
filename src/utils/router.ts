@@ -1,5 +1,6 @@
 import { RouterConfig } from "../types";
 import { Theme } from "./theme";
+import { RecipeList } from "../pages/RecipeList";
 
 export class Router {
   private static instance: Router;
@@ -52,6 +53,15 @@ export class Router {
     if (route) {
       const content = await route.component();
       document.getElementById("app")!.innerHTML = content;
+      
+      // Initialize the current page component
+      const currentPath = window.location.pathname;
+      if (currentPath === "/recipes") {
+        const recipeList = new RecipeList();
+        recipeList.initializeEventListeners();
+        recipeList.initializeIntersectionObserver();
+      }
+      
       // Re-initialize theme after route change
       Theme.init();
     } else {

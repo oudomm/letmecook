@@ -7,7 +7,20 @@ export class RecipeDetail {
   private footer = new Footer();
 
   async render(): Promise<string> {
-    const id = parseInt(window.location.pathname.split("/").pop() || "1");
+    const pathParts = window.location.pathname.split("/");
+    const id = parseInt(pathParts[pathParts.length - 1]);
+    
+    if (isNaN(id)) {
+      return `
+        <div class="min-h-screen flex items-center justify-center">
+          <div class="text-center">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Invalid recipe ID</h1>
+            <a href="/recipes" class="text-orange-500 hover:text-orange-600">Back to recipes</a>
+          </div>
+        </div>
+      `;
+    }
+
     const recipe = await ApiService.getRecipeById(id);
 
     if (!recipe) {
