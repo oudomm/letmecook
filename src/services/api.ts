@@ -3,7 +3,7 @@ import { Recipe } from "../types";
 const BASE_URL = process.env.PARCEL_API_URL;
 
 export class ApiService {
-  static async getRecipes(): Promise<Recipe[]> {
+  static async getRecipes(page: number = 1): Promise<Recipe[]> {
     try {
       const response = await fetch(BASE_URL);
       if (!response.ok) throw new Error("Failed to fetch recipes");

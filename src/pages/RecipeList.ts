@@ -202,12 +202,42 @@ export class RecipeList {
     const searchButton = document.getElementById("searchButton");
 
     if (searchInput && searchButton) {
-      const debounceSearch = this.debounce(this.handleSearch.bind(this), 300);
-      searchInput.addEventListener("input", debounceSearch);
-      searchButton.addEventListener("click", () =>
-        this.handleSearch(searchInput.value)
-      );
+      const debounceSearch = this.debounce((value: string) => {
+        this.handleSearch({ target: { value } } as any);
+      }, 300);
+      searchInput.addEventListener("input", (e) => debounceSearch((e.target as HTMLInputElement).value));
+      searchButton.addEventListener("click", () => debounceSearch(searchInput.value));
     }
+  }
+
+  private initializeFilters(): void {
+    document.querySelectorAll("[data-filter]").forEach((button) => {
+      button.addEventListener("click", this.handleFilterClick.bind(this));
+    });
+  }
+
+  private initializeSortButton(): void {
+    const sortButton = document.getElementById("sortButton");
+    const sortMenu = document.getElementById("sortMenu");
+
+    if (sortButton && sortMenu) {
+      sortButton.addEventListener("click", () => {
+        sortMenu.classList.toggle("hidden");
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener("click", (e) => {
+        if (!sortButton.contains(e.target as Node) && !sortMenu.contains(e.target as Node)) {
+          sortMenu.classList.add("hidden");
+        }
+      });
+    }
+  }
+
+  private initializeRecipeCards(): void {
+    document.querySelectorAll("[data-recipe-id]").forEach((card) => {
+      card.addEventListener("click", this.handleRecipeClick.bind(this));
+    });
   }
 
   // Add debounce utility
@@ -410,41 +440,9 @@ export class RecipeList {
     `;
   }
 
-  // Method to initialize event listeners (call this after rendering)
-  private initializeEventListeners(): void {
-    // Search functionality
-    const searchInput = document.getElementById(
-      "searchInput"
-    ) as HTMLInputElement;
-    if (searchInput) {
-      searchInput.addEventListener("input", this.handleSearch.bind(this));
-    }
-
-    // Filter tags
-    document.querySelectorAll("[data-filter]").forEach((button) => {
-      button.addEventListener("click", this.handleFilterClick.bind(this));
-    });
-
-    // Recipe cards
-    document.querySelectorAll("[data-recipe-id]").forEach((card) => {
-      card.addEventListener("click", this.handleRecipeClick.bind(this));
-    });
-
-    document.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement;
-      // Find closest parent recipe card
-      const recipeCard = target.closest("[data-recipe-id]");
-      if (recipeCard) {
-        const recipeId = recipeCard.getAttribute("data-recipe-id");
-        if (recipeId) {
-          window.location.href = `/recipe/${recipeId}`;
-        }
-      }
-    });
-  }
-
-  private handleSearch(event: Event): void {
+  private handleSearch(event: Event | { target: { value: string } }): void {
     const query = (event.target as HTMLInputElement).value.toLowerCase();
+    this.searchQuery = query;
     // Implement search logic here
     console.log("Searching for:", query);
   }
