@@ -4,6 +4,7 @@ import { RecipeList } from "./pages/RecipeList";
 import { RecipeDetail } from "./pages/RecipeDetail";
 import { Theme } from "./utils/theme";
 import { About } from "./pages/About";
+import { NotFound } from "./pages/NotFound";
 
 // Initialize theme first
 Theme.init();

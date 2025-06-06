@@ -1,6 +1,7 @@
 import { RouterConfig } from "../types";
 import { Theme } from "./theme";
 import { RecipeList } from "../pages/RecipeList";
+import { NotFound } from "../pages/NotFound";
 
 export class Router {
   private static instance: Router;
@@ -51,23 +52,42 @@ export class Router {
     });
 
     if (route) {
-      const content = await route.component();
-      document.getElementById("app")!.innerHTML = content;
-      
-      // Initialize the current page component
-      const currentPath = window.location.pathname;
-      if (currentPath === "/recipes") {
-        const recipeList = new RecipeList();
-        recipeList.initializeEventListeners();
-        recipeList.initializeIntersectionObserver();
+      try {
+        const content = await route.component();
+        document.getElementById("app")!.innerHTML = content;
+        
+        // Initialize the current page component
+        const currentPath = window.location.pathname;
+        if (currentPath === "/recipes") {
+          const recipeList = new RecipeList();
+          recipeList.initializeEventListeners();
+          recipeList.initializeIntersectionObserver();
+        }
+        
+        // Re-initialize theme after route change
+        Theme.init();
+      } catch (error) {
+        console.error('Error loading route:', error);
+        this.showNotFound();
       }
-      
-      // Re-initialize theme after route change
-      Theme.init();
     } else {
-      window.location.href = "/";
+      this.showNotFound();
     }
+  }
+
+  private showNotFound(): void {
+    const notFound = new NotFound();
+    document.getElementById("app")!.innerHTML = notFound.render();
+    Theme.init();
+  }
+}
+
+// Make router available globally for onclick handlers
+declare global {
+  interface Window {
+    router: Router;
   }
 }
 
 export const router = Router.getInstance();
+window.router = router;
