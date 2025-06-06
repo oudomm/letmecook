@@ -1,15 +1,17 @@
 export class Theme {
-  private static readonly STORAGE_KEY = "theme";
+  private static readonly STORAGE_KEY = "darkMode";
   private static readonly DARK_CLASS = "dark";
 
   static init(): void {
     // Check stored preference or system preference
-    if (
-      localStorage.getItem(this.STORAGE_KEY) === "dark" ||
+    const isDark = localStorage.getItem(this.STORAGE_KEY) === "true" ||
       (!localStorage.getItem(this.STORAGE_KEY) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+    if (isDark) {
       document.documentElement.classList.add(this.DARK_CLASS);
+    } else {
+      document.documentElement.classList.remove(this.DARK_CLASS);
     }
 
     // Remove any existing event listener
@@ -17,6 +19,12 @@ export class Theme {
 
     // Add new event listener
     document.addEventListener("click", this.handleClick);
+
+    // Update any existing toggle buttons
+    const toggleButton = document.getElementById("darkModeToggle");
+    if (toggleButton) {
+      this.updateToggleButton(toggleButton);
+    }
   }
 
   private static handleClick = (e: Event) => {
@@ -33,7 +41,7 @@ export class Theme {
 
   private static toggle(): void {
     const isDark = document.documentElement.classList.toggle(this.DARK_CLASS);
-    localStorage.setItem(this.STORAGE_KEY, isDark ? "dark" : "light");
+    localStorage.setItem(this.STORAGE_KEY, isDark.toString());
   }
 
   private static updateToggleButton(button: HTMLElement): void {

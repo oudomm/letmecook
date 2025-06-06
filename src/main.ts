@@ -5,6 +5,9 @@ import { RecipeDetail } from "./pages/RecipeDetail";
 import { Theme } from "./utils/theme";
 import { About } from "./pages/About";
 
+// Initialize theme first
+Theme.init();
+
 const router = Router.getInstance();
 
 // Add routes
@@ -24,9 +27,6 @@ router.addRoute({
 
 // Initialize the router
 router.handleRoute();
-
-// Initialize theme
-Theme.init();
 
 // Handle browser navigation
 window.addEventListener("popstate", () => {
