@@ -92,7 +92,7 @@ export class Home {
                   <!-- Main Image - Higher z-index -->
                   <div class="relative z-20 rounded-3xl overflow-hidden shadow-2xl transform rotate-2 hover:rotate-0 transition-all duration-500 hover:scale-105">
                     <img 
-                      src="https://images.unsplash.com/photo-1547592180-85f173990554?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" 
+                      src="https://i.pinimg.com/736x/7c/e3/3f/7ce33f172326d81fe3968d9d1fc305ca.jpg" 
                       alt="Delicious Food" 
                       class="w-full h-auto"
                     />
