@@ -6,6 +6,7 @@ import { Router } from "../utils/router";
 import { RecipeCard } from "../components/RecipeCard";
 
 export class RecipeList {
+  private static recipes: Recipe[] = [];
   private header = new Header();
   private footer = new Footer();
   private currentPage = 1;
@@ -20,8 +21,15 @@ export class RecipeList {
     });
   }
 
+  private async loadRecipes(): Promise<void> {
+    if (RecipeList.recipes.length === 0) {
+      RecipeList.recipes = await ApiService.getRecipes();
+    }
+  }
+
   async render(): Promise<string> {
-    const recipes = await ApiService.getRecipes();
+    await this.loadRecipes();
+    const filteredRecipes = this.filterRecipes(RecipeList.recipes);
 
     return `
       ${this.header.render()}
@@ -104,7 +112,7 @@ export class RecipeList {
 
           <!-- Recipe Grid with Masonry Layout -->
           <div id="recipeGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 auto-rows-auto">
-            ${this.renderRecipes(recipes)}
+            ${this.renderRecipes(filteredRecipes)}
           </div>
 
           <!-- Loading Indicator -->
@@ -124,9 +132,9 @@ export class RecipeList {
   private renderSortOptions(): string {
     const options = [
       { value: "rating", label: "Highest Rated" },
-      { value: "newest", label: "Newest First" },
       { value: "cookTime", label: "Cooking Time" },
       { value: "popularity", label: "Most Popular" },
+      { value: "newest", label: "Newest First" },
     ];
 
     return options
@@ -199,6 +207,18 @@ export class RecipeList {
     if (sortButton && sortMenu) {
       sortButton.addEventListener("click", () => {
         sortMenu.classList.toggle("hidden");
+      });
+
+      // Add click handlers for sort options
+      sortMenu.querySelectorAll("[data-sort]").forEach((option) => {
+        option.addEventListener("click", (e) => {
+          const target = e.target as HTMLElement;
+          const sortBy = target.getAttribute("data-sort");
+          if (sortBy) {
+            this.handleSort(sortBy);
+            sortMenu.classList.add("hidden");
+          }
+        });
       });
 
       // Close menu when clicking outside
@@ -278,18 +298,29 @@ export class RecipeList {
       .join("");
   }
 
-  private handleSearch(event: Event | { target: { value: string } }): void {
-    const query = (event.target as HTMLInputElement).value.toLowerCase();
-    this.searchQuery = query;
-    // Implement search logic here
-    console.log("Searching for:", query);
+  private filterRecipes(recipes: Recipe[]): Recipe[] {
+    if (this.activeFilter === "all") {
+      return recipes;
+    }
+
+    return recipes.filter(recipe => 
+      recipe.cuisine.toLowerCase() === this.activeFilter.toLowerCase()
+    );
   }
 
   private handleFilterClick(event: Event): void {
-    const button = event.target as HTMLElement;
-    const filter = button.dataset.filter;
+    const target = event.target as HTMLElement;
+    const button = target.closest('button');
+    
+    if (!button) return;
+    
+    const filter = button.getAttribute('data-filter');
+    if (!filter) return;
 
     // Update active filter
+    this.activeFilter = filter;
+
+    // Update button styles
     document.querySelectorAll("[data-filter]").forEach((btn) => {
       btn.classList.remove(
         "bg-gradient-to-r",
@@ -320,7 +351,51 @@ export class RecipeList {
       "dark:text-gray-300"
     );
 
-    console.log("Filtering by:", filter);
+    // Filter and update the recipe grid
+    const filteredRecipes = this.filterRecipes(RecipeList.recipes);
+    
+    const recipeGrid = document.getElementById("recipeGrid");
+    if (recipeGrid) {
+      if (filteredRecipes.length === 0) {
+        recipeGrid.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <p class="text-gray-500 dark:text-gray-400">No recipes found for this cuisine.</p>
+          </div>
+        `;
+      } else {
+        recipeGrid.innerHTML = this.renderRecipes(filteredRecipes);
+        // Re-initialize event listeners for the new cards
+        this.initializeRecipeCards();
+      }
+    }
+  }
+
+  private handleSearch(event: Event | { target: { value: string } }): void {
+    const query = (event.target as HTMLInputElement).value.toLowerCase();
+    this.searchQuery = query;
+
+    // Filter recipes based on search query
+    const filteredRecipes = RecipeList.recipes.filter(recipe => 
+      recipe.name.toLowerCase().includes(query) ||
+      recipe.cuisine.toLowerCase().includes(query) ||
+      recipe.ingredients.some(ingredient => ingredient.toLowerCase().includes(query))
+    );
+
+    // Update the recipe grid
+    const recipeGrid = document.getElementById("recipeGrid");
+    if (recipeGrid) {
+      if (filteredRecipes.length === 0) {
+        recipeGrid.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <p class="text-gray-500 dark:text-gray-400">No recipes found matching your search.</p>
+          </div>
+        `;
+      } else {
+        recipeGrid.innerHTML = this.renderRecipes(filteredRecipes);
+        // Re-initialize event listeners for the new cards
+        this.initializeRecipeCards();
+      }
+    }
   }
 
   private async loadMoreRecipes(): Promise<void> {
@@ -334,6 +409,9 @@ export class RecipeList {
 
     this.currentPage++;
     const newRecipes = await ApiService.getRecipes(this.currentPage);
+    
+    // Add new recipes to static recipes array
+    RecipeList.recipes = [...RecipeList.recipes, ...newRecipes];
 
     const recipeGrid = document.getElementById("recipeGrid");
     if (recipeGrid && newRecipes.length > 0) {
@@ -343,6 +421,50 @@ export class RecipeList {
 
     if (loadingIndicator) {
       loadingIndicator.classList.add("hidden");
+    }
+  }
+
+  private handleSort(sortBy: string): void {
+    let sortedRecipes = [...RecipeList.recipes];
+
+    switch (sortBy) {
+      case "rating":
+        sortedRecipes.sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
+        break;
+      case "cookTime":
+        sortedRecipes.sort((a, b) => {
+          const aTime = Number(a.cookTimeMinutes || 0);
+          const bTime = Number(b.cookTimeMinutes || 0);
+          
+          // If both have valid times, sort normally
+          if (aTime > 0 && bTime > 0) {
+            return aTime - bTime;
+          }
+          
+          // If only one has a valid time, put the valid one first
+          if (aTime > 0) return -1;
+          if (bTime > 0) return 1;
+          
+          // If neither has a valid time, maintain original order
+          return 0;
+        });
+        break;
+      case "popularity":
+        // Since we don't have reviewCount, we'll use rating as a proxy for popularity
+        sortedRecipes.sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
+        break;
+      case "newest":
+        // Since we don't have createdAt, we'll use id as a proxy for newness
+        sortedRecipes.sort((a, b) => Number(b.id) - Number(a.id));
+        break;
+    }
+
+    // Update the recipe grid with sorted recipes
+    const recipeGrid = document.getElementById("recipeGrid");
+    if (recipeGrid) {
+      recipeGrid.innerHTML = this.renderRecipes(sortedRecipes);
+      // Re-initialize event listeners for the new cards
+      this.initializeRecipeCards();
     }
   }
 }
