@@ -1,6 +1,6 @@
 import { Recipe } from "../types";
 
-const BASE_URL = "https://dummyjson.com/recipes";
+const BASE_URL = process.env.PARCEL_API_URL;
 
 export class ApiService {
   static async getRecipes(): Promise<Recipe[]> {

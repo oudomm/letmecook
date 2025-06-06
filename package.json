@@ -15,11 +15,13 @@
   "type": "commonjs",
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.8",
+    "dotenv": "^16.5.0",
     "parcel": "^2.15.2",
     "tailwindcss": "^4.1.8"
   },
   "devDependencies": {
     "@parcel/packager-raw-url": "^2.15.2",
-    "@parcel/transformer-webmanifest": "^2.15.2"
+    "@parcel/transformer-webmanifest": "^2.15.2",
+    "@types/node": "^22.15.30"
   }
 }
