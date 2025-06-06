@@ -13,7 +13,7 @@ export class About {
         <section class="relative h-[70vh] overflow-hidden">
           <div class="absolute inset-0">
             <img 
-              src="https://kpopping.com/documents/1f/4/800/241219-NewJeans-Twitter-Update-Find-The-Cooking-Queen-Stills-documents-1(2).jpeg?v=d31db" 
+              src="https://external-preview.redd.it/250108-newjeans-weverse-update-v0-xWpgZ-Cm9zfVzNqJ6gYZlAh9zhwJQf5bk9HoY1crEWs.jpg?auto=webp&s=6ef3e1145173e8b1d917a61cdf8cc97178d92274"
               alt="Kitchen Background" 
               class="w-full h-full object-cover"
             />
@@ -188,7 +188,7 @@ export class About {
                   role: "Founder & Head Chef",
                   image:
                     "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=500&q=60",
-                  quote: "Cooking is about passion, creativity, and sharing",
+                  quote: "Cooking is about passion, and sharing",
                 },
                 {
                   name: "Michael Chen",

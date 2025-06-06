@@ -29,8 +29,8 @@ export class RecipeList {
         <section class="relative h-[50vh] overflow-hidden mb-16">
           <div class="absolute inset-0">
             <img 
-              src="https://kpopping.com/documents/24/1/800/241219-NewJeans-Twitter-Update-Find-The-Cooking-Queen-Stills-documents-2(1).jpeg?v=d31db" 
-              alt="Recipes Background" 
+              src="https://staticg.sportskeeda.com/editor/2025/02/3662c-17389180452526-1920.jpg?w=640"
+              alt="Eating Background"
               class="w-full h-full object-cover"
             />
             <div class="absolute inset-0 bg-black/60"></div>
