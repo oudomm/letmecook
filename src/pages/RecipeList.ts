@@ -4,6 +4,7 @@ import { ApiService } from "../services/api";
 import { Recipe } from "../types";
 import { Router } from "../utils/router";
 import { RecipeCard } from "../components/RecipeCard";
+import { RecipeCardSkeleton } from "../components/RecipeCardSkeleton";
 
 export class RecipeList {
   private static recipes: Recipe[] = [];
@@ -13,24 +14,54 @@ export class RecipeList {
   private recipesPerPage = 8;
   private activeFilter = "all";
   private searchQuery = "";
+  private isLoading = false;
 
   constructor() {
     document.addEventListener("DOMContentLoaded", () => {
       this.initializeEventListeners();
       this.initializeIntersectionObserver();
+      this.loadRecipes();
     });
+  }
+
+  private renderSkeletons(count: number): string {
+    return Array(count)
+      .fill(0)
+      .map((_, index) => new RecipeCardSkeleton(index).render())
+      .join("");
   }
 
   private async loadRecipes(): Promise<void> {
     if (RecipeList.recipes.length === 0) {
-      RecipeList.recipes = await ApiService.getRecipes();
+      this.isLoading = true;
+      const recipeGrid = document.getElementById("recipeGrid");
+      if (recipeGrid) {
+        recipeGrid.innerHTML = this.renderSkeletons(8);
+      }
+      
+      try {
+        RecipeList.recipes = await ApiService.getRecipes();
+        if (recipeGrid) {
+          const filteredRecipes = this.filterRecipes(RecipeList.recipes);
+          recipeGrid.innerHTML = this.renderRecipes(filteredRecipes);
+          this.initializeRecipeCards();
+        }
+      } catch (error) {
+        console.error('Error loading recipes:', error);
+        if (recipeGrid) {
+          recipeGrid.innerHTML = `
+            <div class="col-span-full text-center py-12">
+              <p class="text-red-500">Failed to load recipes. Please try again later.</p>
+            </div>
+          `;
+        }
+      } finally {
+        this.isLoading = false;
+      }
     }
   }
 
   async render(): Promise<string> {
-    await this.loadRecipes();
-    const filteredRecipes = this.filterRecipes(RecipeList.recipes);
-
     return `
       ${this.header.render()}
       <main class="pb-24 min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -66,13 +97,13 @@ export class RecipeList {
                 <div class="relative flex items-center">
                   <input 
                     type="text" 
-                    id="searchInput"
+                    id="searchInput" 
                     placeholder="Search for recipes, cuisines, or ingredients..." 
                     class="w-full px-6 py-4 pl-14 text-lg rounded-2xl border-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-xl focus:ring-4 focus:ring-orange-500/20 focus:outline-none transition-all duration-300 placeholder-gray-500 text-gray-900 dark:text-white"
                   >
                   <button 
                     id="searchButton"
-                    class="cursor-pointer absolute right-3 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl opacity-90 hover:opacity-100 transition-opacity"
+                    class="absolute right-3 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl opacity-90 hover:opacity-100 transition-opacity"
                   >
                     Search
                   </button>
@@ -96,7 +127,7 @@ export class RecipeList {
             
             <!-- Sort Dropdown -->
             <div class="relative group">
-              <button id="sortButton" class="cursor-pointer flex items-center gap-2 px-6 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+              <button id="sortButton" class="flex items-center gap-2 px-6 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
                 <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
                 </svg>
@@ -112,7 +143,7 @@ export class RecipeList {
 
           <!-- Recipe Grid with Masonry Layout -->
           <div id="recipeGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 auto-rows-auto">
-            ${this.renderRecipes(filteredRecipes)}
+            ${this.renderSkeletons(8)}
           </div>
 
           <!-- Loading Indicator -->
@@ -404,23 +435,28 @@ export class RecipeList {
       loadingIndicator.classList.remove("hidden");
     }
 
-    // Simulate loading delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    this.isLoading = true;
+    try {
+      // Simulate loading delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    this.currentPage++;
-    const newRecipes = await ApiService.getRecipes(this.currentPage);
-    
-    // Add new recipes to static recipes array
-    RecipeList.recipes = [...RecipeList.recipes, ...newRecipes];
+      this.currentPage++;
+      const newRecipes = await ApiService.getRecipes(this.currentPage);
+      
+      // Add new recipes to static recipes array
+      RecipeList.recipes = [...RecipeList.recipes, ...newRecipes];
 
-    const recipeGrid = document.getElementById("recipeGrid");
-    if (recipeGrid && newRecipes.length > 0) {
-      const newRecipesHtml = this.renderRecipes(newRecipes);
-      recipeGrid.insertAdjacentHTML("beforeend", newRecipesHtml);
-    }
-
-    if (loadingIndicator) {
-      loadingIndicator.classList.add("hidden");
+      const recipeGrid = document.getElementById("recipeGrid");
+      if (recipeGrid && newRecipes.length > 0) {
+        const newRecipesHtml = this.renderRecipes(newRecipes);
+        recipeGrid.insertAdjacentHTML("beforeend", newRecipesHtml);
+        this.initializeRecipeCards();
+      }
+    } finally {
+      this.isLoading = false;
+      if (loadingIndicator) {
+        loadingIndicator.classList.add("hidden");
+      }
     }
   }
 

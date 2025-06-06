@@ -9,24 +9,31 @@ import { NotFound } from "./pages/NotFound";
 // Initialize theme first
 Theme.init();
 
+// Initialize router
 const router = Router.getInstance();
 
 // Add routes
-router.addRoute({ path: "/", component: async () => new Home().render() });
+router.addRoute({
+  path: "/",
+  component: async () => new Home().render(),
+});
+
 router.addRoute({
   path: "/recipes",
   component: async () => new RecipeList().render(),
 });
+
 router.addRoute({
   path: "/recipe/:id",
   component: async () => new RecipeDetail().render(),
 });
+
 router.addRoute({
   path: "/about",
   component: async () => new About().render(),
 });
 
-// Initialize the router
+// Handle initial route
 router.handleRoute();
 
 // Handle browser navigation

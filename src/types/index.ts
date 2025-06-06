@@ -8,6 +8,8 @@ export interface Recipe {
   rating: number;
   cuisine: string;
   cookTimeMinutes?: string;
+  prepTimeMinutes?: string;
+  servings?: string;
   tags?: string[];
 }
 
