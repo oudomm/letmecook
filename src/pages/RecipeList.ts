@@ -66,13 +66,13 @@ export class RecipeList {
                 <div class="relative flex items-center">
                   <input 
                     type="text" 
-                    id="searchInput" 
+                    id="searchInput"
                     placeholder="Search for recipes, cuisines, or ingredients..." 
                     class="w-full px-6 py-4 pl-14 text-lg rounded-2xl border-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-xl focus:ring-4 focus:ring-orange-500/20 focus:outline-none transition-all duration-300 placeholder-gray-500 text-gray-900 dark:text-white"
                   >
                   <button 
                     id="searchButton"
-                    class="absolute right-3 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl opacity-90 hover:opacity-100 transition-opacity"
+                    class="cursor-pointer absolute right-3 px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl opacity-90 hover:opacity-100 transition-opacity"
                   >
                     Search
                   </button>
@@ -96,7 +96,7 @@ export class RecipeList {
             
             <!-- Sort Dropdown -->
             <div class="relative group">
-              <button id="sortButton" class="flex items-center gap-2 px-6 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+              <button id="sortButton" class="cursor-pointer flex items-center gap-2 px-6 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
                 <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
                 </svg>
@@ -141,7 +141,7 @@ export class RecipeList {
       .map(
         (option) => `
       <button 
-        class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+        class="cursor-pointer w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
         data-sort="${option.value}"
       >
         ${option.label}
@@ -277,7 +277,7 @@ export class RecipeList {
     return tags
       .map(
         (tag) => `
-      <button class="px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 
+      <button class="cursor-pointer px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 
                      ${
                        tag === "All"
                          ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg"

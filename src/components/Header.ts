@@ -18,7 +18,7 @@ export class Header {
               <a href="/recipes" class="font-medium text-gray-700 hover:text-orange-500 dark:text-gray-200 dark:hover:text-orange-400 transition-colors">Recipes</a>
               <a href="/about" class="font-medium text-gray-700 hover:text-orange-500 dark:text-gray-200 dark:hover:text-orange-400 transition-colors">About</a>
 
-             <button id="darkModeToggle" class="p-2 rounded-full hover:bg-orange-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500">
+             <button id="darkModeToggle" class="cursor-pointer p-2 rounded-full hover:bg-orange-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500">
                 ${
                   isDark
                     ? `
